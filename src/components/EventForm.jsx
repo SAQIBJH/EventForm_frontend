@@ -80,7 +80,7 @@ function EventForm() {
   const handleGuestSearch = (event) => {
     if (event.target.value) {
       const filteredList = completeGuestList.filter((guest) =>
-        guest.guestName.toLowerCase().includes(event.target.value)
+        guest.guestName.toLowerCase().includes(event.target.value.toLowerCase())
       )
       setGuestList(filteredList)
 
@@ -354,7 +354,7 @@ function EventForm() {
             </select>
           </div>
 
-          <div>
+          <div className="mb-4">
           <div className=" relative">
             <label htmlFor="Add Guests"
               className="block text-sm font-medium mb-1"
