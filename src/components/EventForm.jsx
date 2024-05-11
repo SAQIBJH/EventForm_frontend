@@ -7,6 +7,7 @@ import "./Datepicker.css";
 import { Link, useNavigate } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 import "./Select.css"
+import { MdCancel } from "react-icons/md";
 
 function EventForm() {
   const {
@@ -28,6 +29,8 @@ function EventForm() {
     },
   });
 
+
+  const [addedGuests, setAddedGuests] = useState([]);
   const [inputValue, setInputValue] = useState("")
   const [selectedGuest, setSelectedGuest] = useState(null)
 
@@ -105,11 +108,26 @@ function EventForm() {
           "eventGuestIDs",
           [...guestIds, selectedGuest.id] // Add selected guest ID if not already present
         );
+        setAddedGuests((prevAddedGuests) => [...prevAddedGuests, selectedGuest]);
       }
       setInputValue("")
       setSelectedGuest(null); // Clear selected guest after adding (optional)
     }
   };
+
+
+  const handleRemoveGuest = (guestId) => {
+    setAddedGuests((prevAddedGuests) =>
+      prevAddedGuests.filter((guest) => guest.id !== guestId)
+    );
+    const updatedGuestIds = watch("eventGuestIDs").filter((id) => id !== guestId);
+    setValue("eventGuestIDs", updatedGuestIds);
+  };
+
+
+
+
+
   const calculation = () => {
 
     const date = new Date(startDate).toLocaleDateString("en-US", {
@@ -336,8 +354,8 @@ function EventForm() {
             </select>
           </div>
 
-
-          <div className="mb-4 relative">
+          <div>
+          <div className=" relative">
             <label htmlFor="Add Guests"
               className="block text-sm font-medium mb-1"
             >Add Guests</label>
@@ -372,6 +390,25 @@ function EventForm() {
             ))
           )}
           </ul>
+
+
+          <div className="mt-2 flex gap-2">
+            {addedGuests.map((guest) => (
+              <span key={guest.id} className="bg-blue-600 text-sm text-white font-semibold px-2 py-1 rounded-md mr-2 flex items-center w-fit">
+                {guest.guestName}
+                <button
+                  type="button"
+                  className="ml-2 items-center font-semibold  "
+                  onClick={() => handleRemoveGuest(guest.id)}
+                >
+                  <MdCancel />
+                </button>
+              </span>
+            ))}
+          </div>
+
+          </div>
+
 
           {/* <div>
             {watch("eventGuestIDs").map((guest)=>guest.guestName)}
