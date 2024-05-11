@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Spinner from "./Spinner.jsx";
+import { toast } from "react-toastify";
 
 function Homepage() {
 
@@ -37,7 +38,9 @@ function Homepage() {
         });
 
         setEvents(newData.reverse());
+        toast.success("Events fetched successfully");
       } catch (error) {
+        toast.error("Failed to fetch events");
         console.log("Fetch Posts Error:", error);
       } finally {
         setLoading(false);

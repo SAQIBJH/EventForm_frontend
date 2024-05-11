@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import Input from "./Input";
 import DatePicker from "react-datepicker";
@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 import "./Select.css"
 import { MdCancel } from "react-icons/md";
+import { toast } from "react-toastify";
 
 function EventForm() {
   const {
@@ -33,6 +34,7 @@ function EventForm() {
   const [addedGuests, setAddedGuests] = useState([]);
   const [inputValue, setInputValue] = useState("")
   const [selectedGuest, setSelectedGuest] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const notificationOptions = ["Email", "Slack"];
   const [showDescription, setShowDescription] = useState(false);
@@ -125,10 +127,7 @@ function EventForm() {
   };
 
 
-
-
-
-  const calculation = () => {
+  const calculation = useMemo(() => {
 
     const date = new Date(startDate).toLocaleDateString("en-US", {
       year: "numeric",
@@ -136,7 +135,7 @@ function EventForm() {
       day: "numeric",
     });
     console.log("startTime ::", startTime);
-    let [hours, minutes] = startTime.split(":");
+    let [hours, minutes] = startTime ? startTime.split(":") : [0, 0];
     let period = +hours >= 12 ? "PM" : "AM";
     console.log("period ::", period);
 
@@ -170,8 +169,7 @@ function EventForm() {
     endMinutes = endMinutes < 10 ? "0" + endMinutes : endMinutes;
 
     return `${date} from ${hours}:${minutes} ${period} until ${endHours}:${endMinutes} ${period}`;
-  };
-
+  }, [startDate, startTime, startDuration])
 
 
 
@@ -179,6 +177,7 @@ function EventForm() {
     // Add data.attachments = watch("attachments"); if needed
 
     try {
+      setLoading(true);
       const response = await fetch("/api/events/createEvents", {
         method: "POST",
         headers: { "Content-Type": "application/json" }, // Set the content type
@@ -191,9 +190,13 @@ function EventForm() {
 
       const responseData = await response.json();
       console.log("Event created successfully:", responseData);
+      toast.success("Event created successfully");
+      setLoading(false);
       navigate("/")
       // Handle successful response (e.g., show a success message, redirect)
     } catch (error) {
+      toast.error("Failed to create event");
+      setLoading(false);
       console.error("Error creating event:", error);
       // Handle errors (e.g., show an error message)
     }
@@ -220,6 +223,7 @@ function EventForm() {
 
   return (
     <div className="max-w-2xl bg-white my-4 sm:my-20 shadow-lg rounded-md mx-4 sm:mx-auto px-4 sm:px-12  py-4 sm:py-16 relative">
+      
       <div className=" mb-12 sm:mb-4 ">
         <Link
           to="/"
@@ -227,7 +231,9 @@ function EventForm() {
           <GoArrowLeft />
         </Link>
       </div>
+
       <h2 className="text-xl font-bold mb-8">Create Event</h2>
+
       <form onSubmit={handleSubmit(onSubmit)} autoFocus>
         <div className="grid grid-cols-1 gap-4">
           <div className="mb-4 relative">
@@ -479,11 +485,13 @@ function EventForm() {
           
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Create Event
+            disabled={loading}
+            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            {loading ? 'Loading...' : 'Create Event'}
           </button>
         </div>
       </form>
+
     </div>
   );
 }
