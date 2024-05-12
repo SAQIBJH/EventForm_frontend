@@ -423,7 +423,7 @@ function EventForm() {
                 </div>
               ) : null}
             </div>
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               {addedGuests.map((guest) => (
                 <span
                   key={guest.id}
@@ -431,7 +431,7 @@ function EventForm() {
                   {guest.guestName}
                   <button
                     type="button"
-                    className="ml-2 items-center font-semibold "
+                    className="ml-2 items-center  font-semibold "
                     onClick={() => handleRemoveGuest(guest.id)}>
                     <MdCancel />
                   </button>
